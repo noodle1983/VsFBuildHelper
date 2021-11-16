@@ -13,7 +13,7 @@
         <Icon guid="ImageCatalogGuid" id="ImageIcon"/>
         <CommandFlag>IconIsMoniker</CommandFlag>
         <Strings>
-          <ButtonText>Sample Tool Window</ButtonText>
+          <ButtonText>Build And Run Window</ButtonText>
         </Strings>
       </Button>
     </Buttons>

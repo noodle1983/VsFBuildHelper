@@ -11,7 +11,7 @@ using EnvDTE;
 namespace VsFBuildHelper
 {
     [PackageRegistration(UseManagedResourcesOnly = true, AllowsBackgroundLoading = true)]
-    [InstalledProductRegistration("Async Tool Window Sample", "Shows how to use an Async Tool Window in Visual Studio 15.6+", "1.0")]
+    [InstalledProductRegistration("VsFBuildHelper", "Tools for CMake Fastbuild", "1.0")]
     [ProvideToolWindow(typeof(BuildAndRunWindow), Style = VsDockStyle.Tabbed, DockedWidth = 300, Window = "DocumentWell", Orientation = ToolWindowOrientation.Left)]
     [Guid("6e3b2e95-902b-4385-a966-30c06ab3c7a6")]
     [ProvideMenuResource("Menus.ctmenu", 1)]
@@ -62,7 +62,7 @@ namespace VsFBuildHelper
         {
             get
             {
-                return "fbuild.exe";
+                return "C:\\tools\\fastbuild\\FBuild.exe";
             }
         }
 
