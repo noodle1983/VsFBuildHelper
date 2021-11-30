@@ -732,16 +732,38 @@ namespace VsFBuildHelper.ToolWindows
             var btn = sender as Button;
             if (btn == null) { return; }
 
-            var instance = btn.DataContext as DebugInstanceInfo;
-            if (curDebugInstance == instance) { return; }
+            var debugInstance = btn.DataContext as DebugInstanceInfo;
+            if (curDebugInstance == debugInstance) { return; }
 
-            curDebugInstance = instance;
+            curDebugInstance = debugInstance;
 
-            groupValueBlock.Text = curDebugInstance.group;
-            for (int i = 0; i < projComboBoxItems.Count; i++) { if (projComboBoxItems[i] as string == curDebugInstance.projectName) { projComboBox.SelectedIndex = i; } }
-            runParamValueBlock.Text = curDebugInstance.cmdParam;
-            dirValueBlock.Text = curDebugInstance.cmdDir;
-            delayValueBlock.Text = curDebugInstance.delay.ToString();
+            FASTBuildPackage fbPackage = (FASTBuildPackage)FASTBuild.Instance.Package;
+            if (null == fbPackage.dte.Solution)
+                return;
+
+            var dte = FASTBuild.Instance.Package.dte;
+            var projects = GetAllVcProject();
+
+            if (!projects.ContainsKey(debugInstance.projectName)) { return; }
+
+            var proj = projects[debugInstance.projectName];
+            var vcproj = proj.Object as VCProject;
+            if (vcproj == null) { return; }
+
+            string projectName = GetSlnName() + "\\" + debugInstance.projectName;
+            dte.ToolWindows.SolutionExplorer.Parent.Activate();
+            dte.ToolWindows.SolutionExplorer.Parent.SetFocus();
+            dte.ToolWindows.SolutionExplorer.GetItem(projectName).Select(vsUISelectionType.vsUISelectionTypeSelect);
+            var debugSettings = vcproj.ActiveConfiguration.DebugSettings as VCDebugSettings;
+
+            var StartArgs = debugSettings.CommandArguments;
+            var StartDir = debugSettings.WorkingDirectory;
+
+            debugSettings.CommandArguments = (string.IsNullOrEmpty(debugInstance.cmdParam)) ? "" : debugInstance.cmdParam;
+            debugSettings.WorkingDirectory = (string.IsNullOrEmpty(debugInstance.cmdDir)) ? "" : debugInstance.cmdDir;
+
+            fbPackage.dte.ExecuteCommand("File.SaveAll");
+
         }
 
         private void delProject(object sender, RoutedEventArgs e)
@@ -775,7 +797,6 @@ namespace VsFBuildHelper.ToolWindows
             var inst = new DebugInstance();
             inst.info = debugInstance;
             inst.exeTime = DateTime.Now;
-            inst.exeTime = inst.exeTime.AddSeconds(debugInstance.delay);
             waitingQueue.Add(inst);
         }
 
@@ -813,6 +834,8 @@ namespace VsFBuildHelper.ToolWindows
             if (vcproj == null) { return; }
 
             string projectName = GetSlnName() + "\\" + debugInstance.projectName;
+            dte.ToolWindows.SolutionExplorer.Parent.Activate();
+            dte.ToolWindows.SolutionExplorer.Parent.SetFocus();
             dte.ToolWindows.SolutionExplorer.GetItem(projectName).Select(vsUISelectionType.vsUISelectionTypeSelect);
             var debugSettings = vcproj.ActiveConfiguration.DebugSettings as VCDebugSettings;
 
